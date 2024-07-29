@@ -193,12 +193,11 @@ impl Processor {
         allow_disabled: bool,
     ) -> Result<(Box<MarketState>, Box<OpenOrders>), ProgramError> {
         let market_state = Market::load(market_acc, &amm.market_program, allow_disabled)?;
-        let open_orders = market_state.load_orders_mut(
+        let open_orders = OpenOrders::load(
             open_orders_acc,
+            Some(market_acc),
             Some(authority_acc),
             &amm.market_program,
-            None,
-            None,
         )?;
         if identity(open_orders.market) != market_acc.key.to_aligned_bytes() {
             return Err(AmmError::InvalidMarket.into());
